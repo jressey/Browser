@@ -1,3 +1,4 @@
+import sys
 from url import HttpURL, HttpsURL, FileURL
 
 def show(body):
@@ -15,13 +16,23 @@ def load(url):
     show(body)
 
 if __name__ == "__main__":
-    import sys
-    scheme = sys.argv[1].split("://", 1)[0]
+    raw_url = sys.argv[1]
+    scheme = ""
+    data_content = ""
+
+    if raw_url.startswith("data:"):
+        scheme = "data"
+        data_content = raw_url.split(",", 1)[1].strip()
+    else:
+        scheme = raw_url.split("://", 1)[0]
+    
     if scheme == "http":
-        load(HttpURL(sys.argv[1]))
+        load(HttpURL(raw_url))
     elif scheme == "https":
-        load(HttpsURL(sys.argv[1]))
+        load(HttpsURL(raw_url))
     elif scheme == "file":
-        load(FileURL(sys.argv[1]))
+        load(FileURL(raw_url))
+    elif scheme == "data":
+        show(data_content)
     else:
         raise ValueError("Unknown scheme")
