@@ -9,12 +9,13 @@ STANDARD_HEADERS = [
 class URL:
     def __init__(self, url):
         self.configured_socketcheme, url = url.split("://", 1)
-        # append so
-        # url = "example.com" becomes "example.com/"
+        
+        # append so url = "example.com" becomes "example.com/"
         if "/" not in url:
             url += "/"
         self.host, url = url.split("/", 1)
         
+        # handle custom port
         if ":" in self.host:
             self.host, port = self.host.split(":", 1)
             self.port = int(port)
@@ -32,8 +33,6 @@ class URL:
 
         self.request += "\r\n"
 
-        print("Making request to:\r\n{}".format(self.request))
-
         self.configured_socket = socket.socket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
@@ -42,6 +41,8 @@ class URL:
 
     def submit_request(self):
 
+        print("Making request to:\r\n{}".format(self.request))
+        
         self.configured_socket.connect((self.host, self.port))
         self.configured_socket.send(self.request.encode("utf-8"))
         response = self.configured_socket.makefile("r", encoding="utf-8", newline="\r\n")
