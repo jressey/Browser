@@ -1,7 +1,13 @@
 import sys
 from url import HttpURL, HttpsURL, FileURL
 
+def clean_tags(body):
+    body = body.replace("&lt;", "<")
+    body = body.replace("&gt;", ">")
+    return body
+
 def show(body):
+    printable = ""
     in_tag = False
     for c in body:
         if c == "<":
@@ -9,7 +15,9 @@ def show(body):
         elif c == ">":
             in_tag = False
         elif not in_tag:
-            print(c, end="")
+            printable += c
+
+    print(clean_tags(printable))
 
 def load(url):
     body = url.submit_request()
