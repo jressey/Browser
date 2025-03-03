@@ -1,38 +1,15 @@
 import sys
 from url import HttpURL, HttpsURL, FileURL
-
-def clean_tags(body):
-    body = body.replace("&lt;", "<")
-    body = body.replace("&gt;", ">")
-    return body
-
-def show(body):
-    printable = ""
-    in_tag = False
-    for c in body:
-        if c == "<":
-            in_tag = True
-        elif c == ">":
-            in_tag = False
-        elif not in_tag:
-            printable += c
-
-    print(clean_tags(printable))
+from body_printer import BodyPrinter
+from web_request_scheme_selector import WebRequestSchemeSelector
 
 def load(url):
     body = url.submit_request()
-    show(body)
+    BodyPrinter(body).print()
 
 if __name__ == "__main__":
     raw_url = sys.argv[1]
-    scheme = ""
-    data_content = ""
-
-    if raw_url.startswith("data:"):
-        scheme = "data"
-        data_content = raw_url.split(",", 1)[1].strip()
-    else:
-        scheme = raw_url.split("://", 1)[0]
+    scheme = WebRequestSchemeSelector(raw_url).select()
     
     if scheme == "http":
         load(HttpURL(raw_url))
@@ -41,6 +18,7 @@ if __name__ == "__main__":
     elif scheme == "file":
         load(FileURL(raw_url))
     elif scheme == "data":
-        show(data_content)
+        data_content = raw_url.split(",", 1)[1].strip()
+        BodyPrinter(data_content).print()
     else:
         raise ValueError("Unknown scheme")
