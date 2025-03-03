@@ -2,7 +2,7 @@ import ssl
 import socket
 
 STANDARD_HEADERS = [
-    "Connection: close\r\n",
+    "Connection: keep-alive\r\n",
     "User-Agent: SwagBroLite\r\n",
 ]
 
@@ -38,6 +38,8 @@ class URL:
             type=socket.SOCK_STREAM,
             proto=socket.IPPROTO_TCP,
         )
+        # enables theoretical reuse of the socket
+        self.configured_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     def submit_request(self):
 
@@ -54,6 +56,8 @@ class URL:
                 break
             try:
                 header, value = line.split(":", 1)
+                if header.lower() == "content-length":
+                    self.content_length = int(value.strip())
                 response_headers[header.lower()] = value.strip()
             except ValueError:
                 print("The line: \"{}\" was ignored as a header".format(line.strip()))
@@ -62,8 +66,7 @@ class URL:
         assert "transfer-encoding" not in response_headers
         assert "content-encoding" not in response_headers
 
-        content = response.read()
-        self.configured_socket.close()
+        content = response.read(self.content_length)
 
         return content
         

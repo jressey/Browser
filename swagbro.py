@@ -3,6 +3,8 @@ from url import HttpURL, HttpsURL, FileURL
 from body_printer import BodyPrinter
 from web_request_scheme_selector import WebRequestSchemeSelector
 
+lookups = {}
+
 def load(url):
     body = url.submit_request()
     BodyPrinter(body, is_view_source).print()
@@ -15,14 +17,23 @@ if __name__ == "__main__":
         raw_url = raw_url.replace("view-source:", "") 
     scheme = web_request_scheme_selector.select()
     
-    if scheme == "http":
-        load(HttpURL(raw_url))
+    if raw_url in lookups:
+            load(lookups[raw_url])
+    elif scheme == "http":
+        http_url = HttpURL(raw_url)
+        lookups[raw_url] = http_url
+        load(http_url)
     elif scheme == "https":
-        load(HttpsURL(raw_url))
+        https_url = HttpsURL(raw_url)
+        lookups[raw_url] = https_url
+        load(https_url)
     elif scheme == "file":
-        load(FileURL(raw_url))
+        file_url = FileURL(raw_url)
+        lookups[raw_url] = file_url
+        load(file_url)
     elif scheme == "data":
         data_content = raw_url.split(",", 1)[1].strip()
+        lookups[raw_url] = data_content
         BodyPrinter(data_content).print()
     else:
         raise ValueError("Unknown scheme")

@@ -1,7 +1,7 @@
 class BodyPrinter:
     def __init__(self, body, is_view_source):
-        self.is_view_source = is_view_source
         self.body = body
+        self.is_view_source = is_view_source
         self.printable = ""
 
     def clean_tags(self):

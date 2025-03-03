@@ -6,3 +6,4 @@ https://browser.engineering/http.html
 - Exercise 1-3: You can short circuit the whole request submission by simply printing the lines. Make sure to send your request in quotations
 - Exercise 1-4: Straightforward
 - Exercise 1-5: It helped to break up responsibility of the code, then it was straightforward.
+- Exercise 1-6: It appears I've met the criteria but it will require further testing for the cache. That is coming up so we'll exercise there.
