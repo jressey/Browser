@@ -1,5 +1,6 @@
 class BodyPrinter:
-    def __init__(self, body):
+    def __init__(self, body, is_view_source):
+        self.is_view_source = is_view_source
         self.body = body
         self.printable = ""
 
@@ -8,6 +9,10 @@ class BodyPrinter:
         self.printable = self.printable.replace("&gt;", ">")
 
     def print(self):
+        if self.is_view_source:
+            print(self.body)
+            return
+        
         in_tag = False
         for c in self.body:
             if c == "<":
