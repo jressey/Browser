@@ -5,4 +5,4 @@ https://browser.engineering/http.html
 - Exercise 1-2: Ha! I had to start a python server in order to serve files. I started it at the root directory. You have to align your local requests to where you start the server. 
 - Exercise 1-3: You can short circuit the whole request submission by simply printing the lines. Make sure to send your request in quotations
 - Exercise 1-4: Straightforward
-- Exercise 1-5: 
+- Exercise 1-5: It helped to break up responsibility of the code, then it was straightforward.
