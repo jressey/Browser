@@ -1,5 +1,6 @@
 import ssl
 import socket
+import io
 
 STANDARD_HEADERS = [
     "Connection: keep-alive\r\n",
@@ -45,20 +46,25 @@ class URL:
 
         print("Making request to:\r\n{}".format(self.request))
         
-        self.configured_socket.connect((self.host, self.port))
+        try:
+            self.configured_socket.connect((self.host, self.port))
+        except OSError:
+            print("Socket already connected")
+        
         self.configured_socket.send(self.request.encode("utf-8"))
-        response = self.configured_socket.makefile("r", encoding="utf-8", newline="\r\n")
-
+        response = self.configured_socket.makefile("rb")
+        plain_response = io.TextIOWrapper(response, encoding='utf-8', newline="\r\n")
         response_headers = {}
         while True:
-            line = response.readline()
+            line = plain_response.readline()
+            print(line)
             if line == "\r\n":
                 break
             try:
                 header, value = line.split(":", 1)
                 if header.lower() == "content-length":
                     self.content_length = int(value.strip())
-                response_headers[header.lower()] = value.strip()
+                    response_headers[header.lower()] = value.strip()
             except ValueError:
                 print("The line: \"{}\" was ignored as a header".format(line.strip()))
                 continue
@@ -66,10 +72,8 @@ class URL:
         assert "transfer-encoding" not in response_headers
         assert "content-encoding" not in response_headers
 
-        content = response.read(self.content_length)
-
-        return content
-        
+        return plain_response.read(self.content_length)
+    
 class HttpURL(URL):
     def __init__(self, url):
         self.port = 80
