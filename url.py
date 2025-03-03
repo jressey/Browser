@@ -97,11 +97,4 @@ class HttpsURL(URL):
         except:
             print("Socket already wrapped")
         return super().submit_request()
-
-class FileURL(URL):
-    def __init__(self, url):
-        self.port = 8000
-        super().__init__(url)
-
-    def submit_request(self):
-        return super().submit_request()
+    

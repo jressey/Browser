@@ -1,5 +1,6 @@
 import sys
-from url import HttpURL, HttpsURL, FileURL
+from url import HttpURL, HttpsURL
+from file_url import FileURL
 from body_printer import BodyPrinter
 from web_request_scheme_selector import WebRequestSchemeSelector
 
@@ -20,15 +21,11 @@ if __name__ == "__main__":
             raw_url = raw_url.replace("view-source:", "") 
         scheme = web_request_scheme_selector.select()
         
-        print("Lookups:")
-        print(lookups)
-        
         if raw_url in lookups:
             if scheme == "data":
                 BodyPrinter(lookups[raw_url]).print()
             else:
                 load(lookups[raw_url])
-                print("used lookup dict")
         elif scheme == "http":
             http_url = HttpURL(raw_url)
             lookups[raw_url] = http_url
@@ -39,7 +36,6 @@ if __name__ == "__main__":
             load(https_url)
         elif scheme == "file":
             file_url = FileURL(raw_url)
-            # exclude file from lookups, since the OS appears to be moving the "cursor" to the end of the file and returning blank
             load(file_url)
         elif scheme == "data":
             data_content = raw_url.split(",", 1)[1].strip()
@@ -47,8 +43,6 @@ if __name__ == "__main__":
             BodyPrinter(data_content).print()
         else:
             raise ValueError("Unknown scheme")
-        
-    
         
 
 """
