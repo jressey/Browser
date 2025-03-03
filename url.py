@@ -9,6 +9,7 @@ STANDARD_HEADERS = [
 
 class URL:
     def __init__(self, url):
+        self.content_length = 1000
         self.configured_socketcheme, url = url.split("://", 1)
         
         # append so url = "example.com" becomes "example.com/"
@@ -39,7 +40,7 @@ class URL:
             type=socket.SOCK_STREAM,
             proto=socket.IPPROTO_TCP,
         )
-        # enables theoretical reuse of the socket
+        # enables reuse of the socket
         self.configured_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     def submit_request(self):
@@ -53,8 +54,10 @@ class URL:
         
         self.configured_socket.send(self.request.encode("utf-8"))
         response = self.configured_socket.makefile("rb")
+
         plain_response = io.TextIOWrapper(response, encoding='utf-8', newline="\r\n")
         response_headers = {}
+
         while True:
             line = plain_response.readline()
             print(line)
@@ -65,14 +68,14 @@ class URL:
                 if header.lower() == "content-length":
                     self.content_length = int(value.strip())
                     response_headers[header.lower()] = value.strip()
-            except ValueError:
-                print("The line: \"{}\" was ignored as a header".format(line.strip()))
+            except ValueError as e:
                 continue
 
         assert "transfer-encoding" not in response_headers
         assert "content-encoding" not in response_headers
 
         return plain_response.read(self.content_length)
+    
     
 class HttpURL(URL):
     def __init__(self, url):
@@ -88,8 +91,11 @@ class HttpsURL(URL):
         super().__init__(url)
 
     def submit_request(self):
-        ctx = ssl.create_default_context()
-        self.configured_socket = ctx.wrap_socket(self.configured_socket, server_hostname=self.host)
+        try:
+            ctx = ssl.create_default_context()
+            self.configured_socket = ctx.wrap_socket(self.configured_socket, server_hostname=self.host)
+        except:
+            print("Socket already wrapped")
         return super().submit_request()
 
 class FileURL(URL):

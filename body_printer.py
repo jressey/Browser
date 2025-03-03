@@ -1,5 +1,5 @@
 class BodyPrinter:
-    def __init__(self, body, is_view_source):
+    def __init__(self, body, is_view_source = False):
         self.body = body
         self.is_view_source = is_view_source
         self.printable = ""
