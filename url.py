@@ -1,6 +1,7 @@
 import ssl
 import socket
 import io
+from web_request_handler import WebRequestHandler
 
 STANDARD_HEADERS = [
     "Connection: keep-alive\r\n",
@@ -44,6 +45,8 @@ class URL:
         self.configured_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     def submit_request(self):
+        is_redirect = False
+        redirect__url = None
 
         print("Making request to:\r\n{}".format(self.request))
         
@@ -60,11 +63,17 @@ class URL:
 
         while True:
             line = plain_response.readline()
-            print(line)
+            # check for redirect
+            if "301 Moved Permanently" in line:
+                print("Redirecting")
+                is_redirect = True
             if line == "\r\n":
                 break
             try:
                 header, value = line.split(":", 1)
+                # get redirect url if present
+                if header.lower() == "location":
+                    redirect_url = value.strip()
                 if header.lower() == "content-length":
                     self.content_length = int(value.strip())
                     response_headers[header.lower()] = value.strip()
@@ -74,7 +83,13 @@ class URL:
         assert "transfer-encoding" not in response_headers
         assert "content-encoding" not in response_headers
 
-        return plain_response.read(self.content_length)
+        if is_redirect:
+            WebRequestHandler().load(HttpURL(redirect_url), False)
+            # make a new call
+            print(redirect_url)
+            pass
+        else:    
+            return plain_response.read(self.content_length)
     
     
 class HttpURL(URL):
