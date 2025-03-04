@@ -32,7 +32,8 @@ if __name__ == "__main__":
             load(http_url)
         elif scheme == "https":
             https_url = HttpsURL(raw_url)
-            lookups[raw_url] = https_url
+            # exclude reusing socket for https
+            # can try using a more advanced socket library
             load(https_url)
         elif scheme == "file":
             file_url = FileURL(raw_url)
