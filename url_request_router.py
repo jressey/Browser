@@ -26,7 +26,6 @@ class UrlRequestRouter:
             else:
                 self.web_request_handler.load(self.lookups[self.raw_url], self.is_view_source)
 
-        print(self.scheme)
         self.assign_url_object()
         self.process_request()
     
@@ -36,7 +35,6 @@ class UrlRequestRouter:
             self.lookups[self.raw_url] = self.url
         elif self.scheme == "https":
             self.url = HttpsURL(self.raw_url)
-            print("ok")
         elif self.scheme == "file":
             self.url = FileURL(self.raw_url)
         elif self.scheme == "data":
