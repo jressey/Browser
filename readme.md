@@ -7,3 +7,12 @@ https://browser.engineering/http.html
 - Exercise 1-4: Straightforward
 - Exercise 1-5: It helped to break up responsibility of the code, then it was straightforward.
 - Exercise 1-6: It appears I've met the criteria but it will require further testing for the cache. That is coming up so we'll exercise there.
+
+
+## Good test cases
+- HTTP: `python3 swagbro.py http://www.example.com`
+- HTTPS: `python3 swagbro.py http://joeessey.com`
+- FILE: `python3 swagbro.py file:///<your app directory>/text.txt`
+- DATA: `python3 swagbro.py data:text/html,"Hello world!"` (Quotes are necessary on the command line)
+- REDIRECT: `python3 swagbro.py http://browser.engineering/redirect`
+- VIEW-SOURCE: `python3 swagbro.py view-source:http://joeessey.com`
