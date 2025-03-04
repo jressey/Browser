@@ -3,6 +3,10 @@ import socket
 import io
 from web_request_handler import WebRequestHandler
 
+class RedirectException(Exception):
+    def __init__(self, redirect_url):
+        self.redirect_url = redirect_url
+
 STANDARD_HEADERS = [
     "Connection: keep-alive\r\n",
     "User-Agent: SwagBroLite\r\n",
@@ -45,8 +49,8 @@ class URL:
         self.configured_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     def submit_request(self):
+        redirect_url = None
         is_redirect = False
-        redirect__url = None
 
         print("Making request to:\r\n{}".format(self.request))
         
@@ -74,6 +78,7 @@ class URL:
                 # get redirect url if present
                 if header.lower() == "location":
                     redirect_url = value.strip()
+                    raise RedirectException(redirect_url)
                 if header.lower() == "content-length":
                     self.content_length = int(value.strip())
                     response_headers[header.lower()] = value.strip()
